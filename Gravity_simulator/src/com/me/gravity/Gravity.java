@@ -25,6 +25,14 @@ public class Gravity implements ApplicationListener {
 	public static Texture Arrow1;
 	public static Texture Arrow2;
 	public static Texture Arrow3;
+	public static Texture red;
+	public static Texture blue;
+	public static Texture yellow;
+	public static Texture green;
+	public static Texture barrowup;
+	public static Texture barrowdown;
+	public static Texture bback;
+	
 	public static TextureRegion T1;
 	public static TextureRegion T2;
 	public static TextureRegion T3;
@@ -49,9 +57,11 @@ public class Gravity implements ApplicationListener {
 	public static float H;
 	public static boolean bounded = false;
 	
-	boolean running = false;
+	public static boolean running = false;
 	
-	float G = 0f;//10000000;
+	public enum STATE {OPEN, CLOSED};
+	
+	public static float G = 100000000;
 	float DT = 0.1f;
 	float total_time = 0f;
 	float CV = 0.1f;
@@ -59,7 +69,9 @@ public class Gravity implements ApplicationListener {
 	float generate = 0;
 	Random Rand = new Random();
 	
-	private List<Planet> corpos = new ArrayList<Planet>(10);
+	ButtonDrawer butdr;
+	
+	public static List<Planet> corpos = new ArrayList<Planet>(10);
 	
 	@Override
 	public void create() {		
@@ -86,9 +98,32 @@ public class Gravity implements ApplicationListener {
 		Arrow3= new Texture(Gdx.files.internal("data/seta3.png"));
 		Arrow3.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
+		red = new Texture( Gdx.files.internal("data/red.png"));
+		red.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		blue = new Texture( Gdx.files.internal("data/blue.png"));
+		blue.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		yellow = new Texture( Gdx.files.internal("data/yellow.png"));
+		yellow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		green = new Texture( Gdx.files.internal("data/green.png"));
+		green.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		barrowup = new Texture( Gdx.files.internal("data/arrowup.png"));
+		barrowup.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		barrowdown = new Texture( Gdx.files.internal("data/arrowdown.png"));
+		barrowdown.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		bback = new Texture( Gdx.files.internal("data/bback.png"));
+		bback.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
 		T1 = new TextureRegion( Gravity.Arrow1, 0, 0, 1024, 256);
 		T2 = new TextureRegion( Gravity.Arrow2, 0, 0, 1024, 256);
 		T3 = new TextureRegion( Gravity.Arrow3, 0, 0, 1024, 256);
+		
+		butdr = new ButtonDrawer();
 		
 	}
 
@@ -117,7 +152,7 @@ public class Gravity implements ApplicationListener {
 		// System.out.println(corpos.size());
 		
 		double EK = 0;
-		
+		double Ep = 0;
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -126,13 +161,20 @@ public class Gravity implements ApplicationListener {
 			
 		for( Planet p: corpos)
 		{
+			for(Planet q:corpos)
+			{
+				if(q!=p)
+				{
+					Ep+=Gravity.G*p.charge*q.charge/q.Pos.add(p.Pos.mult(-1)).size();
+				}
+			}
 			EK += 0.5 * p.mass* p.Vel.sizesq();
 			p.draw(batch);
 		}
+		Ep/=2;
+		//System.out.println("E: " + (EK+Ep));
 		
-		//System.out.println("EK: " + EK);
-		
-		
+		butdr.draw(batch);
 		
 		batch.end();
 	}
@@ -218,30 +260,61 @@ public class Gravity implements ApplicationListener {
 			Np = false;
 		}
 		
-		if( pressed )
+		
+		if(butdr.state == STATE.CLOSED)
 		{
-			if( !Gdx.input.isTouched() )
+			if( pressed )
 			{
-				pressed = false;
-				float endpointx = Gdx.input.getX();
-				float endpointy = Gdx.input.getY();
-				
-				float dx = startpointx - endpointx;
-				float dy = startpointy - endpointy;
-				int k = 1;
-				if( negativeMass) k = -1;
-				corpos.add( new Planet( endpointx-W/2, -endpointy + H/2, dx*CV, -dy*CV, k ,100));
+				if( !Gdx.input.isTouched() )
+				{
+					pressed = false;
+					float endpointx = Gdx.input.getX();
+					float endpointy = Gdx.input.getY();
+					
+					float dx = startpointx - endpointx;
+					float dy = startpointy - endpointy;
+					int k = 1;
+					if( negativeMass) k = -1;
+					corpos.add( new Planet( endpointx-W/2, -endpointy + H/2, dx*CV, -dy*CV, k ,100));
+				}
+			}
+			
+			if(!pressed)
+			{
+				if( Gdx.input.isTouched())
+				{
+					startpointx =  Gdx.input.getX();
+					startpointy = Gdx.input.getY();
+					Vector touch = new Vector(startpointx-Gravity.W/2, -startpointy + Gravity.H/2);
+					//System.out.println(startpointx+" "+startpointy);
+					if( !butdr.checkPress(touch))
+						pressed = true;
+				}
 			}
 		}
 		
-		if(!pressed)
+		if(butdr.state == STATE.OPEN)
 		{
-			if( Gdx.input.isTouched())
+			if( !pressed && Gdx.input.isTouched())
 			{
 				pressed = true;
 				startpointx =  Gdx.input.getX();
 				startpointy = Gdx.input.getY();
 			}
+			
+			if(pressed && !Gdx.input.isTouched())
+			{
+				float tx =  Gdx.input.getX();
+				float ty = Gdx.input.getY();
+				if(Math.abs(startpointx-tx)< 10 && Math.abs(startpointy - ty)<10)
+				{
+					Vector touch = new Vector(tx-Gravity.W/2, -ty + Gravity.H/2);
+					//System.out.println(startpointx+" "+startpointy);
+					butdr.checkPress(touch);
+				}
+				pressed = false;
+			}
+			
 		}
 	}
 	
@@ -287,10 +360,10 @@ public class Gravity implements ApplicationListener {
 			p.update(DT);
 			Xmax = Math.max(Xmax, Math.abs(p.Pos.x));
 			Ymax = Math.max(Ymax, Math.abs(p.Pos.y));
-			System.out.println(p.Pos.x + " " + p.Pos.y);
+			//System.out.println(p.Pos.x + " " + p.Pos.y);
 		}		
 		System.out.println("END SIM");
-		W = (float)Math.max((Xmax*2), Wreg );
+		/*W = (float)Math.max((Xmax*2), Wreg );
 		H = (float)Math.max((Ymax*2), Hreg );
 		
 		if( W * Hreg/Wreg > H)
@@ -300,7 +373,7 @@ public class Gravity implements ApplicationListener {
 		else
 		{
 			W = H * Wreg/Hreg;
-		}
+		}*/
 
 		
 	}
@@ -311,7 +384,7 @@ public class Gravity implements ApplicationListener {
 		if( generate >= LIMGEN)
 		{
 			generate = 0;
-			corpos.add( new Planet(Rand.nextInt((int)W) - W/2  ,Rand.nextInt((int)H) - H/2 , Rand.nextFloat()*100 - 50 ,Rand.nextFloat()*100 - 50, Rand.nextFloat()*2 - 1, 100 ));
+			corpos.add( new Planet(Rand.nextInt((int)W) - W/2  ,Rand.nextInt((int)H) - H/2 , Rand.nextFloat()*100 - 50 ,Rand.nextFloat()*100 - 50, Rand.nextFloat()*2 - 1, 1000 ));
 		}
 	}
 }

@@ -93,9 +93,28 @@ public class Planet {
 		Vector sep = new Vector( Pos.add( X.Pos.mult(-1) ) );
 		if( sep.sizesq() <= (radii+X.radii)*(radii+X.radii) )
 		{
-			
-			sep.multS ( (radii+X.radii + EPS)/sep.size() );
+			/*double V1 = 0;
+			for(Planet p: Gravity.corpos)
+			{
+				if(p!= this)
+				{
+					double deltaPos = ( Pos.add(p.Pos.mult(-1))).size(); 
+					V1 += Gravity.G * p.charge/ deltaPos;
+				}
+			}*/
+			sep.multS ( (radii + X.radii + EPS)/sep.size() );
 			Pos = X.Pos.add( sep );	
+			
+			/*double V2 = 0;
+			for(Planet p: Gravity.corpos)
+			{
+				if(p!= this)
+				{
+					double deltaPos = ( Pos.add(p.Pos.mult(-1))).size(); 
+					V2 += Gravity.G * p.charge/ deltaPos;
+				}
+			}*/
+						
 			
 			Vector RelVelX = new Vector( X.Vel.add( Vel.mult(-1) ) );
 			//System.out.println("RELVELX: " + RelVelX.x + " " + RelVelX.y + " " + RelVelX.size());
@@ -118,9 +137,16 @@ public class Planet {
 			//System.out.println("XVel: " + X.Vel.x + " " + X.Vel.y + " " + X.Vel.size());
 			
 			RelVelX.addS(K.mult(-1));
-			RelVelX.addS( Vel);
+			RelVelX.addS( this.Vel);
 			X.Vel = RelVelX;
-			Vel.addS(RelVelA);
+			this.Vel.addS(RelVelA);
+			
+			//System.out.println("qdV "+ this.charge*(V2-V1));
+			
+			//double V =  Vel.sizesq();
+			//Vel.norm();
+			//System.out.println(V + (2*this.charge*(V2-V1) * sep.size())/this.mass);
+			//Vel.multS(Math.sqrt(V - (2*this.charge*(V2-V1) * sep.size())/this.mass));
 			
 			//System.out.println("Vel: " + Vel.x + " " + Vel.y + " " + Vel.size());
 			//System.out.println("XVel: " + X.Vel.x + " " + X.Vel.y + " " + X.Vel.size());
