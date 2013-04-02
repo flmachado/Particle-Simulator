@@ -25,14 +25,24 @@ public class ButtonDrawer {
 		back.setPosition(-back.getWidth()/2, (float) (-back.getHeight() - Gravity.H/2));
 		
 		
-		buttons.add(new Button( new Vector(-Gravity.W/2+20,-Gravity.H/2+20),	new Vector(40,40),Button.ID.BUTUP	, Gravity.barrowup ));
-		buttons.add(new Button( new Vector(-Gravity.W/2+20,-Gravity.H/2+20),	new Vector(40,40),Button.ID.BUTDO	, Gravity.barrowdown ));
-		buttons.add(new Button( new Vector(20,20-back.getHeight()), 		new Vector(40,40),Button.ID.RED		, Gravity.red)		);
-		buttons.add(new Button( new Vector(60,60-back.getHeight()), 		new Vector(40,40),Button.ID.GREEN	, Gravity.green)	);
-		buttons.add(new Button( new Vector(20,60-back.getHeight()), 		new Vector(40,40),Button.ID.BLUE	, Gravity.blue)		);
-		buttons.add(new Button( new Vector(60,20-back.getHeight()), 		new Vector(40,40),Button.ID.YELLOW	, Gravity.yellow)	);
+		buttons.add(new Button( new Vector(-Gravity.W/2 +20,-Gravity.H/2 +20),	new Vector(40,40),Button.ID.BUTUP	, Gravity.barrowup ));
+		buttons.add(new Button( new Vector(-Gravity.W/2 +20,-Gravity.H/2 +20),	new Vector(40,40),Button.ID.BUTDO	, Gravity.barrowdown ));
 		
-		preview		= new Planet( 100 , 200, 0 ,0 , 0, 100);
+		
+		buttons.add(new Button( new Vector(50,-60-back.getHeight()), 		new Vector(60,60),Button.ID.MASSUP		, Gravity.plus)		);
+		buttons.add(new Button( new Vector(130,-60-back.getHeight()), 		new Vector(60,60),Button.ID.MASSDOWN	, Gravity.minus)	);
+		
+		buttons.add(new Button( new Vector(50,20-back.getHeight()), 		new Vector(60,60),Button.ID.CHARGEUP		, Gravity.plus)		);
+		buttons.add(new Button( new Vector(130,20-back.getHeight()), 		new Vector(60,60),Button.ID.CHARGEDOWN	, Gravity.minus)	);
+		
+		
+		buttons.add(new Button( new Vector(-back.getWidth()/2 + 60 ,-back.getHeight() + 80 - Gravity.H/2 ),
+				new Vector(60,60),Button.ID.CLEAR	, Gravity.green)	);
+		buttons.add(new Button( new Vector(-back.getWidth()/2 + 140 ,-back.getHeight() + 80 - Gravity.H/2 ),
+				new Vector(60,60),Button.ID.FORCE	, Gravity.blue)	);
+		//buttons.add(new Button( new Vector(60,20-back.getHeight()), 		new Vector(40,40),Button.ID.YELLOW	, Gravity.yellow)	);
+		
+		preview	= new Planet( -back.getWidth()/4, -20 - back.getHeight(), 0 ,0 , 0, 10);
 		
 		state = Gravity.STATE.CLOSED;
 	}
@@ -51,7 +61,7 @@ public class ButtonDrawer {
 				break;
 			}
 		}
-		System.out.println(toact);
+		//System.out.println(toact);
 		switch(toact)
 		{
 		case BUTUP:
@@ -62,8 +72,28 @@ public class ButtonDrawer {
 			this.changestate();
 			System.out.println("DOWN");
 			break;
-		case RED:
-			System.out.println("RED");
+		case MASSUP:
+			preview.addMass(1);
+			break;
+			
+		case MASSDOWN:
+			preview.addMass(-1);
+			break;
+		
+		case CHARGEUP:
+			preview.addCharge(0.1);
+			break;
+			
+		case CHARGEDOWN:
+			preview.addCharge(-0.1);
+			break;
+			
+		case CLEAR:
+			Gravity.ClearCorpos();
+			break;
+			
+		case FORCE:
+			Gravity.ToogleForces();
 			break;
 			
 		case GREEN:
@@ -87,12 +117,12 @@ public class ButtonDrawer {
 	public void draw(SpriteBatch batch)
 	{
 		back.draw(batch);
-
 		for(Button b:buttons)
 		{
 			if( state == Gravity.STATE.CLOSED && b.id == Button.ID.BUTDO) continue;
 			if( state == Gravity.STATE.OPEN	  && b.id == Button.ID.BUTUP) continue;
 			b.draw(batch);
+			preview.draw(batch);
 		}
 		
 		preview.draw(batch);
@@ -108,6 +138,8 @@ public class ButtonDrawer {
 			{
 				b.move(0, back.getHeight());
 			}
+			preview.changePos(0,back.getHeight());
+			
 			back.setPosition(-Gravity.W/2, -Gravity.H/2);
 			state = Gravity.STATE.OPEN;
 		}
@@ -118,9 +150,15 @@ public class ButtonDrawer {
 			{
 				b.move(0, -back.getHeight());
 			}
+			preview.changePos(0,-back.getHeight());
 			back.setPosition(-Gravity.W/2, -back.getHeight()-Gravity.H/2);
 			state = Gravity.STATE.CLOSED;
 		}
+	}
+	
+	public Planet getPlanet()
+	{
+		return preview;
 	}
 	
 }

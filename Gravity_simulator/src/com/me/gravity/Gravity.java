@@ -32,6 +32,8 @@ public class Gravity implements ApplicationListener {
 	public static Texture barrowup;
 	public static Texture barrowdown;
 	public static Texture bback;
+	public static Texture plus;
+	public static Texture minus;
 	
 	public static TextureRegion T1;
 	public static TextureRegion T2;
@@ -61,7 +63,7 @@ public class Gravity implements ApplicationListener {
 	
 	public enum STATE {OPEN, CLOSED};
 	
-	public static float G = 100000000;
+	public static float G = 1000000;
 	float DT = 0.1f;
 	float total_time = 0f;
 	float CV = 0.1f;
@@ -118,6 +120,12 @@ public class Gravity implements ApplicationListener {
 		
 		bback = new Texture( Gdx.files.internal("data/bback.png"));
 		bback.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		plus = new Texture( Gdx.files.internal("data/plus.png"));
+		plus.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
+		minus = new Texture( Gdx.files.internal("data/minus.png"));
+		minus.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		T1 = new TextureRegion( Gravity.Arrow1, 0, 0, 1024, 256);
 		T2 = new TextureRegion( Gravity.Arrow2, 0, 0, 1024, 256);
@@ -275,7 +283,8 @@ public class Gravity implements ApplicationListener {
 					float dy = startpointy - endpointy;
 					int k = 1;
 					if( negativeMass) k = -1;
-					corpos.add( new Planet( endpointx-W/2, -endpointy + H/2, dx*CV, -dy*CV, k ,100));
+					Planet T = butdr.getPlanet();
+					corpos.add( new Planet( endpointx-W/2, -endpointy + H/2, dx*CV, -dy*CV, T.charge ,T.mass));
 				}
 			}
 			
@@ -386,5 +395,15 @@ public class Gravity implements ApplicationListener {
 			generate = 0;
 			corpos.add( new Planet(Rand.nextInt((int)W) - W/2  ,Rand.nextInt((int)H) - H/2 , Rand.nextFloat()*100 - 50 ,Rand.nextFloat()*100 - 50, Rand.nextFloat()*2 - 1, 1000 ));
 		}
+	}
+	
+	public static void ClearCorpos()
+	{
+		corpos.clear();
+	}
+	
+	public static void ToogleForces()
+	{
+		forces = !forces;
 	}
 }

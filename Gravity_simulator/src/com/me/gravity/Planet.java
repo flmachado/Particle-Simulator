@@ -16,7 +16,7 @@ public class Planet {
 	
 	double EPS = 0.00001f;
 	
-	double C = 0.2f;
+	double C = 20f;
 	
 	Sprite im;
 	
@@ -44,16 +44,37 @@ public class Planet {
 		im.setOrigin(im.getWidth()/2, im.getHeight()/2);
 		im.setPosition( (float)(Pos.x- im.getWidth()/2), (float)(Pos.y - im.getHeight()/2));
 		
+		updateColor();
+		
 	}
 	
 	public void update(double dt)
 	{
 		if( Gravity.bounded)
 		{
-			if( Pos.x > Gravity.W/2-radii || Pos.x < -Gravity.W/2 + radii)
+			if( Pos.x > Gravity.W/2-radii)
+			{
+				Pos.x = Gravity.W/2 - radii -EPS;
 				Vel.x=-Vel.x;
-			if( Pos.y  > Gravity.H/2 - radii || Pos.y  < -Gravity.H/2 + radii )
-				Vel.y = -Vel.y;
+			}
+				
+			if(Pos.x < -Gravity.W/2 + radii)
+			{
+				Pos.x = -Gravity.W/2 + radii + EPS;
+				Vel.x=-Vel.x;
+			}
+				
+			if( Pos.y > Gravity.H/2-radii)
+			{
+				Pos.y = Gravity.H/2 - radii -EPS;
+				Vel.y=-Vel.y;
+			}
+				
+			if(Pos.y < -Gravity.H/2 + radii)
+			{
+				Pos.y = -Gravity.H/2 + radii + EPS;
+				Vel.y=-Vel.y;
+			}
 		}
 		Acel.x = Force.x/mass;
 		Acel.y = Force.y/mass;
@@ -80,7 +101,9 @@ public class Planet {
 	
 	public void draw(SpriteBatch b)
 	{
+		
 		im.draw(b);
+		
 		if( Gravity.forces == true)
 		{
 			vel.draw(b);
@@ -165,4 +188,32 @@ public class Planet {
 		im.setPosition((float)(Pos.x - im.getWidth()/2), (float)(Pos.y  - im.getHeight()/2));
 	}
 	
+	public void addCharge( double dq)
+	{
+		this.charge += dq;
+		updateColor();
+	}
+	
+	public void changePos(double dx, double dy)
+	{
+		Pos.x += dx;
+		Pos.y += dy;
+		im.setPosition((float)(Pos.x - im.getWidth()/2), (float)(Pos.y  - im.getHeight()/2));
+	}
+	
+	private void updateColor()
+	{
+		float rd = 0;
+		float bl = 0;
+		if( this.charge > 0)
+		{
+			rd = (float) (this.charge/(0.5+this.charge));
+		}
+		else
+		{
+			bl = (float) (this.charge/(0.5-this.charge));
+		}
+		
+		im.setColor(rd, 0, bl, 1);
+	}
 }

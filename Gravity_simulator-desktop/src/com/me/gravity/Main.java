@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Gravity_simulator";
 		cfg.useGL20 = false;
-		cfg.width = 500;
-		cfg.height = 800;
+		cfg.width = 400;
+		cfg.height = 600;
 		
 		new LwjglApplication(new Gravity(), cfg);
 	}
