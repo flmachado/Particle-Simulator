@@ -406,4 +406,9 @@ public class Gravity implements ApplicationListener {
 	{
 		forces = !forces;
 	}
+	
+	public static void ToogleWalls()
+	{
+		bounded = !bounded;
+	}
 }

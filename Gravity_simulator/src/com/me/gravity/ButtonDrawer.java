@@ -4,13 +4,12 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.me.gravity.Button.ID;
 
 
 public class ButtonDrawer {
 	
 	Sprite back;
-	Sprite arrowup;
-	Sprite arrowdown;
 	Planet preview;
 	Gravity.STATE state;
 
@@ -25,26 +24,35 @@ public class ButtonDrawer {
 		back.setPosition(-back.getWidth()/2, (float) (-back.getHeight() - Gravity.H/2));
 		
 		
-		buttons.add(new Button( new Vector(-Gravity.W/2 +20,-Gravity.H/2 +20),	new Vector(40,40),Button.ID.BUTUP	, Gravity.barrowup ));
-		buttons.add(new Button( new Vector(-Gravity.W/2 +20,-Gravity.H/2 +20),	new Vector(40,40),Button.ID.BUTDO	, Gravity.barrowdown ));
+		buttons.add(new Button( new Vector(-Gravity.W/2 + Gravity.H/16,-Gravity.H/2 +Gravity.H/16),	
+				new Vector(Gravity.H/8,Gravity.H/8),Button.ID.BUTUP	, Gravity.barrowup ));
+		buttons.add(new Button( new Vector(-Gravity.W/2 + Gravity.H/16,-Gravity.H/2 +Gravity.H/16),	
+				new Vector(Gravity.H/8,Gravity.H/8),Button.ID.BUTDO	, Gravity.barrowdown ));
 		
 		
-		buttons.add(new Button( new Vector(50,-60-back.getHeight()), 		new Vector(60,60),Button.ID.MASSUP		, Gravity.plus)		);
-		buttons.add(new Button( new Vector(130,-60-back.getHeight()), 		new Vector(60,60),Button.ID.MASSDOWN	, Gravity.minus)	);
+		buttons.add(new Button( new Vector(Gravity.W/8, -Gravity.H/2 - back.getHeight()*((float)1/(float)8)),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.MASSUP		, Gravity.plus)		);
+		buttons.add(new Button( new Vector(Gravity.W*3/8, -Gravity.H/2 - back.getHeight()*((float)1/(float)8)),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.MASSDOWN	, Gravity.minus)	);
 		
-		buttons.add(new Button( new Vector(50,20-back.getHeight()), 		new Vector(60,60),Button.ID.CHARGEUP		, Gravity.plus)		);
-		buttons.add(new Button( new Vector(130,20-back.getHeight()), 		new Vector(60,60),Button.ID.CHARGEDOWN	, Gravity.minus)	);
+		buttons.add(new Button( new Vector(Gravity.W/8, -Gravity.H/2 - back.getHeight()*((float)3/(float)8)),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.CHARGEUP		, Gravity.plus)		);
+		buttons.add(new Button( new Vector(Gravity.W*3/8, -Gravity.H/2 - back.getHeight()*((float)3/(float)8)),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.CHARGEDOWN	, Gravity.minus)	);
 		
 		
-		buttons.add(new Button( new Vector(-back.getWidth()/2 + 60 ,-back.getHeight() + 80 - Gravity.H/2 ),
-				new Vector(60,60),Button.ID.CLEAR	, Gravity.green)	);
-		buttons.add(new Button( new Vector(-back.getWidth()/2 + 140 ,-back.getHeight() + 80 - Gravity.H/2 ),
-				new Vector(60,60),Button.ID.FORCE	, Gravity.blue)	);
-		//buttons.add(new Button( new Vector(60,20-back.getHeight()), 		new Vector(40,40),Button.ID.YELLOW	, Gravity.yellow)	);
+		buttons.add(new Button( new Vector(-back.getWidth()/2 + Gravity.H/10 * 1 ,Gravity.H/10 - Gravity.H ),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.CLEAR	, Gravity.green)	);
+		buttons.add(new Button( new Vector(-back.getWidth()/2 + Gravity.H/10*2.5 ,Gravity.H/10  - Gravity.H ),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.FORCE	, Gravity.blue)	);
+		buttons.add(new Button( new Vector(-back.getWidth()/2 + Gravity.H/10*4 ,Gravity.H/10  - Gravity.H ),
+				new Vector(Gravity.H/10,Gravity.H/10),Button.ID.WALLS	, Gravity.yellow)	);
 		
 		preview	= new Planet( -back.getWidth()/4, -20 - back.getHeight(), 0 ,0 , 0, 10);
 		
 		state = Gravity.STATE.CLOSED;
+		this.changestate();
+		this.changestate();
 	}
 	
 	public boolean checkPress( Vector touch)
@@ -95,6 +103,10 @@ public class ButtonDrawer {
 		case FORCE:
 			Gravity.ToogleForces();
 			break;
+		
+		case WALLS:
+			Gravity.ToogleWalls();
+			break;
 			
 		case GREEN:
 			System.out.println("GREEN");
@@ -116,16 +128,27 @@ public class ButtonDrawer {
 	
 	public void draw(SpriteBatch batch)
 	{
-		back.draw(batch);
-		for(Button b:buttons)
+		if(state == Gravity.STATE.CLOSED)
 		{
-			if( state == Gravity.STATE.CLOSED && b.id == Button.ID.BUTDO) continue;
-			if( state == Gravity.STATE.OPEN	  && b.id == Button.ID.BUTUP) continue;
-			b.draw(batch);
-			preview.draw(batch);
+			for(Button b: buttons)
+				if(b.id == Button.ID.BUTUP)
+				{
+					System.out.println(b.Pos.x +" "+b.Pos.y);
+					b.draw(batch);
+				}
 		}
 		
-		preview.draw(batch);
+		else{
+			back.draw(batch);
+			for(Button b:buttons)
+			{
+				if( b.id == Button.ID.BUTUP) continue;
+				b.draw(batch);
+				preview.draw(batch);
+			}
+			
+			preview.draw(batch);
+		}
 	}
 	
 	private void changestate()

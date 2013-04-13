@@ -211,7 +211,7 @@ public class Planet {
 		}
 		else
 		{
-			bl = (float) (this.charge/(0.5-this.charge));
+			bl = (float) (this.charge/(-0.5+this.charge));
 		}
 		
 		im.setColor(rd, 0, bl, 1);

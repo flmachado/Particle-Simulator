@@ -10,7 +10,7 @@ public class Button {
 	Vector Size;
 	Sprite T;
 	
-	public enum ID {ZERO, MASSUP, MASSDOWN,CHARGEUP, CHARGEDOWN,CLEAR, FORCE, GREEN, BLUE, YELLOW, BUTUP, BUTDO};
+	public enum ID {ZERO, MASSUP, MASSDOWN,CHARGEUP, CHARGEDOWN,CLEAR, FORCE, WALLS, GREEN, BLUE, YELLOW, BUTUP, BUTDO};
 	ID id;
 	
 	public Button(Vector Pos, Vector Size, ID id, Texture T)
